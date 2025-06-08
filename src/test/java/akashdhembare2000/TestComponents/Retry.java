@@ -1,2 +1,19 @@
-package akashdhembare2000.TestComponents;public class Retry {
+package akashdhembare2000.TestComponents;
+
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+public class Retry implements IRetryAnalyzer {
+   int count=0;
+   int maxTry=1;
+
+    @Override
+    public boolean retry(ITestResult iTestResult) {
+        if(count<maxTry){
+            count++;
+            return true;
+        }
+
+        return false;
+    }
 }

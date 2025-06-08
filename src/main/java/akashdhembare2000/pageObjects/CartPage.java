@@ -9,10 +9,10 @@ import org.openqa.selenium.support.PageFactory;
 
 import java.util.List;
 
-public class ProductCatelogue extends AbstractComponent {
+public class CartPage extends AbstractComponent {
     WebDriver driver;
 
-    public ProductCatelogue(WebDriver driver){
+    public CartPage(WebDriver driver){
         super(driver); // Every child should give the life of driver to parent, so we are defining it in every child class
         // initialization
         this.driver=driver;
@@ -20,41 +20,28 @@ public class ProductCatelogue extends AbstractComponent {
     }
 
 
-   // List<WebElement> products= driver.findElements(By.cssSelector(".mb-3"));
+
 
     // Page Factory
-    @FindBy(css = ".mb-3")
-    List<WebElement> products;
+    @FindBy(css = ".totalRow button")
+    WebElement checkoutEle;
 
-    @FindBy(css = ".ng-animating")
-    WebElement spinner;
+    @FindBy(css = ".cartSection h3")
+    List<WebElement> cartProducts;
 
-
-    // Page Factory is for driver.findElement construction only.
-    By productsBy=By.cssSelector(".mb-3");
-    By addToCart=By.cssSelector(".card-body button:last-of-type");
-    By toastMessage = By.cssSelector("#toast-container");
-
-    public List<WebElement> getProductList(){
-        waitForElementToAppear(productsBy);
-
-       return products;
+    public Boolean VerifyProductDisplay(String productName){
+        Boolean match=cartProducts.stream().anyMatch(product->product.getText().equalsIgnoreCase(productName));
+        return match;
     }
 
-    public WebElement getProductByName(String productName){
-        // Iterating through the list of products using Java Streams and finding the element with matching text
-        WebElement prod = getProductList().stream().filter(product->
-                product.findElement(By.cssSelector("b")).getText().equals(productName)).findFirst().orElse(null);
+    public CheckoutPage goToCheckout(){
+        checkoutEle.click();
 
-        return prod;
+        return new CheckoutPage(driver);
     }
 
-    public void addProductToCart(String productName){
-        // Clicking on Add to Cart button
-        WebElement prod=getProductByName(productName);
-        prod.findElement(addToCart).click();
-        waitForElementToAppear(toastMessage);
-        waitForElementToDisappear(spinner);
-    }
+
+
+
 
 }

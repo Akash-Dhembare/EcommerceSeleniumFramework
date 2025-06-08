@@ -1,44 +1,59 @@
 package akashdhembare2000.pageObjects;
 
+import akashdhembare2000.AbstractComponents.AbstractComponent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-public class LandingPage {
+import java.util.List;
+
+public class ProductCatelogue extends AbstractComponent {
     WebDriver driver;
 
-    public LandingPage(WebDriver driver){
+    public ProductCatelogue(WebDriver driver){
+        super(driver); // Every child should give the life of driver to parent, so we are defining it in every child class
         // initialization
         this.driver=driver;
-
         PageFactory.initElements(driver, this);
     }
 
 
- //   WebElement userEmail=driver.findElement(By.id("userEmail"));
+   // List<WebElement> products= driver.findElements(By.cssSelector(".mb-3"));
 
     // Page Factory
-    @FindBy(id = "userEmail")
-    WebElement userEmail;
+    @FindBy(css = ".mb-3")
+    List<WebElement> products;
 
-    @FindBy(id = "userPassword")
-    WebElement password;
+    @FindBy(css = ".ng-animating")
+    WebElement spinner;
 
-    @FindBy(id = "login")
-    WebElement submit;
 
-    public void goTo(){
-        driver.get("https://rahulshettyacademy.com/client/");
+    // Page Factory is for driver.findElement construction only.
+    By productsBy=By.cssSelector(".mb-3");
+    By addToCart=By.cssSelector(".card-body button:last-of-type");
+    By toastMessage = By.cssSelector("#toast-container");
+
+    public List<WebElement> getProductList(){
+        waitForElementToAppear(productsBy);
+        return products;
     }
-    // Action Methods
-    public void loginApplication(String email, String pass){
-        // Page Object should not hold any data
-        // Page object should only focus on Elements and Actions
-        // If you want to send the data, send it through the testcase (Send data through arguments)
-        userEmail.sendKeys(email);
-        password.sendKeys(pass);
-        submit.click();
+
+    public WebElement getProductByName(String productName){
+        // Iterating through the list of products using Java Streams and finding the element with matching text
+        WebElement prod = getProductList().stream().filter(product->
+                product.findElement(By.cssSelector("b")).getText().equals(productName)).findFirst().orElse(null);
+
+        return prod;
     }
+
+    public void addProductToCart(String productName){
+        // Clicking on Add to Cart button
+        WebElement prod=getProductByName(productName);
+        prod.findElement(addToCart).click();
+        waitForElementToAppear(toastMessage);
+        waitForElementToDisappear(spinner);
+    }
+
 }
